@@ -1,27 +1,23 @@
-# MattooltipBug
+# MatTooltip Injector Error from Jest
+This repo re-creates a bug with using standalone Components that use `MatTooltipModule` distributed from a library.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.2.
+The repo contains both an Angular library (my-lib) and an Angular app (my-app).  All components are standalone.  The component in the library has a button with a `matTooltip`.
+The app has a local copy of the same component in the `shared` folder.  Beyond the `app.component`, there are two other components to demonstrate the difference in using 
+this component from a library vs. using the same component built locally.  The `local-based` component uses the local version of the component, while the `library-based`
+component, uses the version provided by the library.  The `app.component` uses both `local-based` and `library-based`. 
 
-## Development server
+Running `yarn test` (which uses `jest`), both the `app.component` and `library-based` component tests fail with 
+```bash
+NullInjectorError: R3InjectorError(DynamicTestModule)[InjectionToken mat-tooltip-scroll-strategy -> InjectionToken mat-tooltip-scroll-strategy]:
+      NullInjectorError: No provider for InjectionToken mat-tooltip-scroll-strategy!
+```
+despite the library component properly importing `MatTooltipModule`.  The `local-based` component test succeeds.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Note: the app runs fine, without error.  It's only when running with the `DynamicTestModule` that this fails.
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Repro steps
+1. Run `yarn` from root folder
+1. Run `ng build my-lib` from root
+1. `cd` into `projects/my-app`
+1. Run `yarn` from `projects/my-app`
+1. Run `yarn test` from `projects/my-app`
